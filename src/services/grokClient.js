@@ -46,12 +46,11 @@ export async function askFinanceAssistant({
   chatHistory,
   siteContext,
 }) {
-  const apiKey = import.meta.env.VITE_GROK_API_KEY;
-  const endpoint =
-    import.meta.env.VITE_GROK_API_URL || "https://api.x.ai/v1/chat/completions";
-  const model = import.meta.env.VITE_GROK_MODEL || "grok-2-latest";
+  const endpoint = import.meta.env.VITE_CHAT_PROXY_URL;
 
-  if (!apiKey) {
+  // Never call provider APIs directly from frontend with secret keys.
+  // If no secure backend proxy is configured, use local guidance fallback.
+  if (!endpoint) {
     return createFallbackReply(question, siteContext);
   }
 
@@ -72,12 +71,9 @@ export async function askFinanceAssistant({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model,
         messages,
-        temperature: 0.3,
       }),
     });
 
